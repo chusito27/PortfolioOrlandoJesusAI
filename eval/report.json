@@ -13,28 +13,28 @@
         "answerable": true,
         "retrieval_hit": true,
         "answered": true,
-        "citations": 3
+        "citations": 1
       },
       {
         "question": "How should a microservice handle a partial failure when a downstream service is slow?",
         "answerable": true,
         "retrieval_hit": true,
         "answered": true,
-        "citations": 3
+        "citations": 2
       },
       {
         "question": "What are the trade-offs of asynchronous message-based communication between services?",
         "answerable": true,
         "retrieval_hit": true,
         "answered": true,
-        "citations": 4
+        "citations": 3
       },
       {
         "question": "How do I keep data consistent when each microservice owns its own database?",
         "answerable": true,
         "retrieval_hit": true,
         "answered": true,
-        "citations": 2
+        "citations": 1
       },
       {
         "question": "What does the dotnet clean command do?",
@@ -48,7 +48,7 @@
         "answerable": true,
         "retrieval_hit": true,
         "answered": true,
-        "citations": 1
+        "citations": 2
       },
       {
         "question": "What is BC0101 shared output path?",
@@ -76,21 +76,21 @@
         "answerable": true,
         "retrieval_hit": true,
         "answered": true,
-        "citations": 3
+        "citations": 2
       },
       {
         "question": "What are anonymous types in C#?",
         "answerable": true,
         "retrieval_hit": true,
         "answered": true,
-        "citations": 2
+        "citations": 1
       },
       {
         "question": "Which attributes let a method capture caller information like the file and line number?",
         "answerable": true,
         "retrieval_hit": true,
         "answered": true,
-        "citations": 2
+        "citations": 1
       },
       {
         "question": "What caching options does .NET provide and when would I use each?",
@@ -111,7 +111,7 @@
         "answerable": true,
         "retrieval_hit": true,
         "answered": true,
-        "citations": 3
+        "citations": 1
       },
       {
         "question": "What is dotnet-trace and what do I use it for?",
@@ -125,7 +125,7 @@
         "answerable": true,
         "retrieval_hit": true,
         "answered": true,
-        "citations": 1
+        "citations": 2
       },
       {
         "question": "How do I catch parsing errors when loading XML with LINQ to XML?",

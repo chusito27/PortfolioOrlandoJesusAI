@@ -5,13 +5,12 @@ ask for "AddScoped" and it happily returns passages about service lifetimes in
 general. Pure keyword search is the mirror image. Running both and fusing the
 rankings recovers what either one alone would drop.
 """
-import json
-import re
 from dataclasses import dataclass, field
 
 from app.config import settings
 from app.db import connection
-from app.llm import chat, embed_one
+from app.llm import embed_one
+from app.rerank import rerank as rerank_hits
 
 
 @dataclass
@@ -107,69 +106,13 @@ def _fuse(vector_rows: list[tuple], keyword_rows: list[tuple]) -> list[Hit]:
     return sorted(hits.values(), key=lambda h: h.rrf_score, reverse=True)
 
 
-_RERANK_SYSTEM = (
-    "You score how useful a documentation passage is for answering a question. "
-    "Reply with JSON only."
-)
-
-_RERANK_PROMPT = """Question: {question}
-
-Passages:
-{passages}
-
-For each passage id, score 0-10 how directly it helps answer the question.
-10 means it contains the answer. 0 means it is unrelated.
-
-Reply with JSON only, in this exact shape:
-{{"scores": [{{"id": <id>, "score": <0-10>}}]}}"""
-
-
-async def _rerank(question: str, hits: list[Hit]) -> list[Hit]:
-    """Second-pass relevance scoring by the LLM.
-
-    Retrieval optimises for recall (get the answer somewhere in the top 30).
-    Re-ranking optimises for precision (put it in the top 5 that reach the
-    prompt). Doing both is what stops the generator from being handed plausible
-    but off-target context.
-    """
-    if not hits:
-        return hits
-
-    passages = "\n\n".join(
-        f"[{h.chunk_id}] {h.citation}\n{h.content[:700]}" for h in hits
-    )
-    raw = await chat(
-        _RERANK_PROMPT.format(question=question, passages=passages),
-        system=_RERANK_SYSTEM,
-    )
-
-    scores: dict[int, float] = {}
-    match = re.search(r"\{.*\}", raw, re.S)
-    if match:
-        try:
-            for item in json.loads(match.group(0)).get("scores", []):
-                scores[int(item["id"])] = float(item["score"])
-        except (json.JSONDecodeError, KeyError, TypeError, ValueError):
-            # A malformed rerank must not take the request down. Falling back to
-            # the RRF order is a worse answer, not a failed one.
-            return hits
-
-    for hit in hits:
-        hit.rerank_score = scores.get(hit.chunk_id)
-
-    return sorted(
-        hits,
-        key=lambda h: (h.rerank_score if h.rerank_score is not None else -1, h.rrf_score),
-        reverse=True,
-    )
-
-
 async def search(
     question: str,
     *,
     rerank: bool = True,
     mode: str = "hybrid",
     limit: int | None = None,
+    reranker: str | None = None,
 ) -> list[Hit]:
     """Retrieve context for a question.
 
@@ -193,5 +136,7 @@ async def search(
     if not rerank:
         return fused[:top]
 
-    reranked = await _rerank(question, fused[: settings.rerank_top_n])
+    reranked = await rerank_hits(
+        question, fused[: settings.rerank_top_n], strategy=reranker
+    )
     return reranked[:top]

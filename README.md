@@ -54,7 +54,24 @@ document titles, which favours semantic retrieval and is very likely why vector-
 A larger, more adversarial set, and a corpus with heavier exact-token traffic, would probably
 move these numbers. The weight should be re-swept against any change of embedding model.
 
-Reproduce with `python eval/run_eval.py --ablate` and `python eval/sweep.py`.
+### Re-ranking: an LLM or a cross-encoder
+
+Same hybrid candidate set, two ways to reorder it. Latency is the re-ranking step only.
+
+| Strategy | recall@1 | recall@3 | recall@5 | p50 | p95 |
+|---|---|---|---|---|---|
+| no re-ranking | 94% | 100% | 100% | 0 ms | 0 ms |
+| LLM (`qwen2.5:14b`) | **100%** | 100% | 100% | 1,460 ms | 1,603 ms |
+| cross-encoder (`ms-marco-MiniLM-L-6-v2`) | **100%** | 100% | 100% | **89 ms** | **120 ms** |
+
+Identical recall, **16x lower latency**, and one fewer failure mode: a cross-encoder returns a
+float, while an LLM returns text that has to be parsed and defended against. The cross-encoder
+is the default. The LLM re-ranker is kept because it needs no extra dependency and no model
+download, which matters for a deployment that already hosts a generation model and wants to add
+nothing else.
+
+Reproduce with `python eval/run_eval.py --ablate`, `python eval/sweep.py` and
+`python eval/rerankers.py`.
 
 ## Design
 
@@ -105,13 +122,31 @@ cannot blow past the context budget, with overlap snapped to word boundaries.
 | Layer | Choice | Why |
 |---|---|---|
 | Vector store | PostgreSQL 17 + pgvector | One database for both halves of the hybrid search |
-| Embeddings | `nomic-embed-text` via Ollama | 768 dimensions, local, free |
-| Generation | `qwen2.5:14b` via Ollama | Strong instruction following, runs locally |
+| Embeddings | `nomic-embed-text` (Ollama) or Titan v2 (Bedrock) | Local by default, managed when deployed |
+| Generation | `qwen2.5:14b` (Ollama) or Claude (Bedrock Converse) | Same pipeline either way |
+| Re-ranking | `ms-marco-MiniLM-L-6-v2` cross-encoder | Measured equal recall to LLM re-ranking at 16x lower latency |
 | API | FastAPI | Async throughout; retrieval is IO-bound |
 | Language | Python 3.12 | |
 
-The provider lives behind `app/llm.py`. Moving to OpenAI, Anthropic or Bedrock means rewriting
-that one file; nothing above it knows which provider is in use.
+### Providers
+
+Everything above `app/llm.py` asks for `embed()` and `chat()` and does not know who answers.
+`app/providers.py` holds two implementations:
+
+- **ollama**, the default, so anyone who clones the repo can run it with no cloud account and no
+  per-query cost.
+- **bedrock**, using Titan for embeddings and the Converse API for generation, through boto3.
+  boto3 is synchronous, so calls are pushed to worker threads rather than blocking the event
+  loop, and embedding requests are issued concurrently under a semaphore because Titan's
+  `InvokeModel` accepts one input text per request.
+
+Switching is one line in `.env`, with one caveat that is deliberately not hidden: embedding
+dimensions differ between providers (768 for nomic-embed-text, 1024 for Titan v2) and the
+`chunks` table declares a fixed vector width, so changing provider means changing `EMBED_DIM`
+and re-ingesting. That is why the dimension is configuration rather than a constant.
+
+**Status: the Bedrock path is implemented but has not been run against a live AWS account.**
+The Ollama path is what produced every number in this README.
 
 ## Running it
 
@@ -158,9 +193,11 @@ pool's configure hook made several connections run it simultaneously and collide
 app/
   config.py      settings; every retrieval knob in one place
   db.py          connection pool and schema
-  llm.py         Ollama client, the only provider-aware file
+  llm.py         thin facade over the configured provider
+  providers.py   Ollama and AWS Bedrock implementations
+  rerank.py      LLM and cross-encoder re-ranking strategies
   chunking.py    heading-aware markdown splitting
-  retrieval.py   hybrid search, weighted RRF, LLM re-ranking
+  retrieval.py   hybrid search and weighted RRF
   generate.py    answer generation with citation validation
   main.py        FastAPI
 scripts/
@@ -170,6 +207,7 @@ eval/
   golden.yaml    the golden set
   run_eval.py    full-pipeline metrics and ablation
   sweep.py       retrieval-only recall across strategies and k
+  rerankers.py   re-ranker comparison on recall and latency
 ```
 
 ## Licence
