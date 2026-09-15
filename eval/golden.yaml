@@ -1,0 +1,85 @@
+# Golden set for the evaluation harness.
+#
+# Each case names the question and, for answerable ones, substrings that must
+# appear in the retrieved sources (document title + heading path) for retrieval
+# to count as a hit. Matching on the source rather than the generated text is
+# deliberate: it measures the retriever, which is the component that caps
+# everything downstream.
+#
+# The unanswerable cases are the important half. They are plausible .NET
+# questions the corpus genuinely cannot answer, and they measure whether the
+# system refuses instead of inventing. A RAG demo without them is only testing
+# the easy direction.
+
+cases:
+  # --- conceptual: the semantic half should carry these -------------------
+  - question: Why would I use an API gateway instead of letting clients call microservices directly?
+    expect_path_contains: ["API gateway"]
+
+  - question: How should a microservice handle a partial failure when a downstream service is slow?
+    expect_path_contains: ["partial failure", "resilien"]
+
+  - question: What are the trade-offs of asynchronous message-based communication between services?
+    expect_path_contains: ["Asynchronous message-based communication", "Communication in a microservice"]
+
+  - question: How do I keep data consistent when each microservice owns its own database?
+    expect_path_contains: ["distributed data", "data sovereignty"]
+
+  # --- exact tokens: the keyword half should carry these ------------------
+  - question: What does the dotnet clean command do?
+    expect_path_contains: ["dotnet clean"]
+
+  - question: How do I delete a package from NuGet with the CLI?
+    expect_path_contains: ["dotnet nuget delete"]
+
+  - question: What is BC0101 shared output path?
+    expect_path_contains: ["BC0101"]
+
+  - question: What does dotnet dev-certs do?
+    expect_path_contains: ["dev-certs"]
+
+  # --- language reference -------------------------------------------------
+  - question: What access modifiers exist in C# and what does internal mean?
+    expect_path_contains: ["Access Modifiers"]
+
+  - question: What is a local function in C# and when should I use one instead of a lambda?
+    expect_path_contains: ["Local function"]
+
+  - question: What are anonymous types in C#?
+    expect_path_contains: ["Anonymous type"]
+
+  - question: Which attributes let a method capture caller information like the file and line number?
+    expect_path_contains: ["caller information"]
+
+  # --- extensions and diagnostics ----------------------------------------
+  - question: What caching options does .NET provide and when would I use each?
+    expect_path_contains: ["Caching"]
+
+  - question: What are Channels in .NET used for?
+    expect_path_contains: ["Channels"]
+
+  - question: How do I debug a memory leak in a .NET application?
+    expect_path_contains: ["memory leak"]
+
+  - question: What is dotnet-trace and what do I use it for?
+    expect_path_contains: ["dotnet-trace"]
+
+  # --- LINQ ---------------------------------------------------------------
+  - question: How do I add elements and attributes to an existing XML tree with LINQ to XML?
+    expect_path_contains: ["Add elements"]
+
+  - question: How do I catch parsing errors when loading XML with LINQ to XML?
+    expect_path_contains: ["parsing errors"]
+
+  # --- unanswerable: the corpus does not cover these ----------------------
+  - question: What is the current pricing of Azure Kubernetes Service per node per month?
+    answerable: false
+
+  - question: How do I configure Amazon DynamoDB streams with a Lambda trigger?
+    answerable: false
+
+  - question: Who is the current CEO of Microsoft and when were they appointed?
+    answerable: false
+
+  - question: What is the recommended learning rate for fine-tuning a BERT model?
+    answerable: false

@@ -1,0 +1,167 @@
+{
+  "hybrid + rerank": {
+    "metrics": {
+      "n_answerable": 18,
+      "n_unanswerable": 4,
+      "recall_at_k": 1.0,
+      "grounding_rate": 1.0,
+      "refusal_rate": 1.0
+    },
+    "cases": [
+      {
+        "question": "Why would I use an API gateway instead of letting clients call microservices directly?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 3
+      },
+      {
+        "question": "How should a microservice handle a partial failure when a downstream service is slow?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 3
+      },
+      {
+        "question": "What are the trade-offs of asynchronous message-based communication between services?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 4
+      },
+      {
+        "question": "How do I keep data consistent when each microservice owns its own database?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 2
+      },
+      {
+        "question": "What does the dotnet clean command do?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 1
+      },
+      {
+        "question": "How do I delete a package from NuGet with the CLI?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 1
+      },
+      {
+        "question": "What is BC0101 shared output path?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 1
+      },
+      {
+        "question": "What does dotnet dev-certs do?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 1
+      },
+      {
+        "question": "What access modifiers exist in C# and what does internal mean?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 1
+      },
+      {
+        "question": "What is a local function in C# and when should I use one instead of a lambda?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 3
+      },
+      {
+        "question": "What are anonymous types in C#?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 2
+      },
+      {
+        "question": "Which attributes let a method capture caller information like the file and line number?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 2
+      },
+      {
+        "question": "What caching options does .NET provide and when would I use each?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 2
+      },
+      {
+        "question": "What are Channels in .NET used for?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 2
+      },
+      {
+        "question": "How do I debug a memory leak in a .NET application?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 3
+      },
+      {
+        "question": "What is dotnet-trace and what do I use it for?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 1
+      },
+      {
+        "question": "How do I add elements and attributes to an existing XML tree with LINQ to XML?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 1
+      },
+      {
+        "question": "How do I catch parsing errors when loading XML with LINQ to XML?",
+        "answerable": true,
+        "retrieval_hit": true,
+        "answered": true,
+        "citations": 1
+      },
+      {
+        "question": "What is the current pricing of Azure Kubernetes Service per node per month?",
+        "answerable": false,
+        "retrieval_hit": false,
+        "answered": false,
+        "citations": 0
+      },
+      {
+        "question": "How do I configure Amazon DynamoDB streams with a Lambda trigger?",
+        "answerable": false,
+        "retrieval_hit": false,
+        "answered": false,
+        "citations": 0
+      },
+      {
+        "question": "Who is the current CEO of Microsoft and when were they appointed?",
+        "answerable": false,
+        "retrieval_hit": false,
+        "answered": false,
+        "citations": 0
+      },
+      {
+        "question": "What is the recommended learning rate for fine-tuning a BERT model?",
+        "answerable": false,
+        "retrieval_hit": false,
+        "answered": false,
+        "citations": 0
+      }
+    ]
+  }
+}
